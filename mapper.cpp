@@ -100,11 +100,11 @@ int main(int argc, char* argv[]) {
     auto totalEndTime = high_resolution_clock::now();
 
     //日志形式记录结果
-    cerr << "Mapper Partition File Read Time: " << totalPartitionFileReadTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper Original Data Read Time: " << totalDataReadTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper R-Tree Build Time: " << totalRtreeInsertTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl; 
-    cerr << "Mapper MBR Search Time: " << totalSearchTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper Total Mapper Time: " << duration_cast<microseconds>(totalEndTime - totalStartTime).count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Partition File Read Time: " << totalPartitionFileReadTime.count() / 1000.0 << "ms"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Original Data Read Time: " << totalDataReadTime.count() / 1000.0 << "ms"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper R-Tree Build Time: " << totalRtreeInsertTime.count() / 1000.0 << "ms"<< "     " << "mapper_id" << taskIdStr << endl; 
+    cerr << "Mapper MBR Search Time: " << totalSearchTime.count() / 1000.0 << "ms"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Total Mapper Time: " << duration_cast<microseconds>(totalEndTime - totalStartTime).count() / 1000.0 << "ms"<< "     " << "mapper_id" << taskIdStr << endl;
 
     return 0;
 }
