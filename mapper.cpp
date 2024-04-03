@@ -39,8 +39,6 @@ int main(int argc, char* argv[]) {
     while (true) {
         auto lineReadStartTime = high_resolution_clock::now();
         if (!getline(partitionFile, line)) break; //文件输入
-        auto lineReadEndTime = high_resolution_clock::now();
-        totalPartitionFileReadTime += duration_cast<microseconds>(lineReadEndTime - lineReadStartTime);
 
         istringstream iss(line);
         int partitionIndex;
@@ -49,6 +47,9 @@ int main(int argc, char* argv[]) {
             cerr << "Invalid line format in partition file: " << line << endl;
             continue;
         }
+        auto lineReadEndTime = high_resolution_clock::now();
+        //读入分区文件+读入分区坐标
+        totalPartitionFileReadTime += duration_cast<microseconds>(lineReadEndTime - lineReadStartTime);
 
         auto rtreeInsertStartTime = high_resolution_clock::now(); 
         double min[2] = {minX, minY};
@@ -63,8 +64,6 @@ int main(int argc, char* argv[]) {
     while (true) {
         auto dataReadStartTime = high_resolution_clock::now();
         if (!getline(cin, wktLine)) break; //标准输入
-        auto dataReadEndTime = high_resolution_clock::now();
-        totalDataReadTime += duration_cast<microseconds>(dataReadEndTime - dataReadStartTime);
 
         istringstream wktStream(wktLine);
         string id, mbrStr, wkt;
@@ -81,6 +80,9 @@ int main(int argc, char* argv[]) {
             cerr << "Invalid MBR format in WKT input: " << mbrStr << endl;
             continue; 
         }
+        auto dataReadEndTime = high_resolution_clock::now();
+        //标准输入+分隔数据+读入mbr坐标
+        totalDataReadTime += duration_cast<microseconds>(dataReadEndTime - dataReadStartTime);
 
         double min[2] = {minX, minY};
         double max[2] = {maxX, maxY};
@@ -94,15 +96,15 @@ int main(int argc, char* argv[]) {
         auto searchEndTime = high_resolution_clock::now();
         totalSearchTime += duration_cast<microseconds>(searchEndTime - searchStartTime);
     }
-
+    //map总时间
     auto totalEndTime = high_resolution_clock::now();
 
     //日志形式记录结果
-    cerr << "Mapper Partition File Read Time: " << totalPartitionFileReadTime.count() << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper Original Data Read Time: " << totalDataReadTime.count() << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper R-Tree Insert Time: " << totalRtreeInsertTime.count() << "us"<< "     " << "mapper_id" << taskIdStr << endl; 
-    cerr << "Mapper Total MBR Search Time: " << totalSearchTime.count() << "us"<< "     " << "mapper_id" << taskIdStr << endl;
-    cerr << "Mapper Total Mapper Time: " << duration_cast<microseconds>(totalEndTime - totalStartTime).count() << "us"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Partition File Read Time: " << totalPartitionFileReadTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Original Data Read Time: " << totalDataReadTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper R-Tree Build Time: " << totalRtreeInsertTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl; 
+    cerr << "Mapper MBR Search Time: " << totalSearchTime.count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
+    cerr << "Mapper Total Mapper Time: " << duration_cast<microseconds>(totalEndTime - totalStartTime).count() / 1000.0 << "us"<< "     " << "mapper_id" << taskIdStr << endl;
 
     return 0;
 }

@@ -39,8 +39,21 @@ int main() {
     microseconds totalRTreeBuildTime(0);
     microseconds totalRTreeSearchTime(0);
     microseconds totalContainsTime(0);
+    microseconds totalIOTime(0);//标准输入行
+    microseconds totalPushBackTime(0); //用于累计push_back操作的总时间
 
-    while (getline(cin, line)) {
+
+    while (true) {
+
+        auto ioStart = high_resolution_clock::now(); 
+
+        if (!getline(cin, line)) { 
+            break;
+        }
+
+        auto ioEnd = high_resolution_clock::now(); 
+        //读入map输出文件
+        totalIOTime += duration_cast<microseconds>(ioEnd - ioStart); 
 
         auto wktReadStart = high_resolution_clock::now();
 
@@ -59,9 +72,11 @@ int main() {
         shared_ptr<Geometry> geom = wktReader.read(wkt);
 
         auto wktReadEnd = high_resolution_clock::now();
+        //wkt转换到geos对应格式
         totalWKTReadTime += duration_cast<microseconds>(wktReadEnd - wktReadStart);
 
         if (wkt.substr(0, 3) == "POL") {//对比前三位判断是POLYGON还是POINT
+
             auto rTreeBuildStart = high_resolution_clock::now();
             auto polygon = dynamic_pointer_cast<Polygon>(geom);
             const Envelope* env = polygon->getEnvelopeInternal();//获取mbr
@@ -71,9 +86,16 @@ int main() {
             rtree.Insert(min, max, pd);//插入rtree
             polygonMap[id] = polygon;
             auto rTreeBuildEnd = high_resolution_clock::now();
+            //建立rtree时间
             totalRTreeBuildTime += duration_cast<microseconds>(rTreeBuildEnd - rTreeBuildStart);
+
         } else if (wkt.substr(0, 3) == "POI") {
-            points.push_back(wkt);//存储点用于遍历
+            
+            auto pushBackStart = high_resolution_clock::now(); 
+            points.push_back(wkt);
+            auto pushBackEnd = high_resolution_clock::now();
+            //存储点的时间
+            totalPushBackTime += duration_cast<microseconds>(pushBackEnd - pushBackStart); 
         }
     }
 
@@ -81,6 +103,7 @@ int main() {
         auto wktReadStart = high_resolution_clock::now();
         auto geom = shared_ptr<Geometry>(wktReader.read(wkt));
         auto wktReadEnd = high_resolution_clock::now();
+        //wkt转换到geos对应格式
         totalWKTReadTime += duration_cast<microseconds>(wktReadEnd - wktReadStart);
 
         auto point = dynamic_pointer_cast<Point>(geom);
@@ -101,20 +124,32 @@ int main() {
         totalRTreeSearchTime += duration_cast<microseconds>(rTreeSearchEnd - rTreeSearchStart);
     }
 
+    auto forLoopStart = high_resolution_clock::now(); // 记录for循环开始时间
+
     for (const auto& entry : pointCountMap) {
         cout << "Polygon ID: " << entry.first << ", Points count: " << entry.second << endl;
     }
+
+    auto forLoopEnd = high_resolution_clock::now(); // 记录for循环结束时间
+    auto forLoopDuration = duration_cast<microseconds>(forLoopEnd - forLoopStart).count(); // 计算for循环持续时间
+
 
     rtree.RemoveAll();
 
     auto endTime = high_resolution_clock::now();
 
     //日志形式记录结果
-    cerr << "Reducer WKT Read Time: " << totalWKTReadTime.count() << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer R-Tree Build Time: " << totalRTreeBuildTime.count() << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer R-Tree Search Time: " << (totalRTreeSearchTime.count() - totalContainsTime.count()) << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer Contains Check Time: " << totalContainsTime.count() << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer Total Reducer Time: " << duration_cast<microseconds>(endTime - startTime).count() << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer WKT Read Time: " << totalWKTReadTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer R-Tree Build Time: " << totalRTreeBuildTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    //总时间-精炼时间=使用rtree进行mbr的过滤时间
+    cerr << "Reducer R-Tree Search Time: " << (totalRTreeSearchTime.count() - totalContainsTime.count()) / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer Contains Check Time: " << totalContainsTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer Total Reducer Time: " << duration_cast<microseconds>(endTime - startTime).count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reduce IO Read Time: " << totalIOTime.count() / 1000.0 << "us" << "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer For loop execution time: " << forLoopDuration / 1000.0 << " us" << "     " << "reducer_id" << taskIdStr << endl; 
+    cerr << "Reduce push_back Time: " << totalPushBackTime.count() / 1000.0 << "us" << "     " << "reducer_id" << taskIdStr << endl;
+
+
 
     return 0;
 }
