@@ -139,17 +139,15 @@ int main() {
     auto endTime = high_resolution_clock::now();
 
     //日志形式记录结果
-    cerr << "Reducer WKT Read Time: " << totalWKTReadTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer R-Tree Build Time: " << totalRTreeBuildTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    //总时间-精炼时间=使用rtree进行mbr的过滤时间
-    cerr << "Reducer R-Tree Search Time: " << (totalRTreeSearchTime.count() - totalContainsTime.count()) / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer Contains Check Time: " << totalContainsTime.count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer Total Reducer Time: " << duration_cast<microseconds>(endTime - startTime).count() / 1000.0 << "us"<< "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reduce IO Read Time: " << totalIOTime.count() / 1000.0 << "us" << "     " << "reducer_id" << taskIdStr << endl;
-    cerr << "Reducer For loop execution time: " << forLoopDuration / 1000.0 << " us" << "     " << "reducer_id" << taskIdStr << endl; 
-    cerr << "Reduce push_back Time: " << totalPushBackTime.count() / 1000.0 << "us" << "     " << "reducer_id" << taskIdStr << endl;
-
-
+    cerr << "Reducer WKT Read Time: " << totalWKTReadTime.count() / 1000.0 << "ms"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer R-Tree Build Time: " << totalRTreeBuildTime.count() / 1000.0 << "ms"<< "     " << "reducer_id" << taskIdStr << endl;
+    //使用rtree进行mbr的过滤时间=总时间减去精炼时间
+    cerr << "Reducer R-Tree Search Time: " << (totalRTreeSearchTime.count() - totalContainsTime.count()) / 1000.0 << "ms"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer Contains Check Time: " << totalContainsTime.count() / 1000.0 << "ms"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer Total Reducer Time: " << duration_cast<microseconds>(endTime - startTime).count() / 1000.0 << "ms"<< "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reduce IO Read Time: " << totalIOTime.count() / 1000.0 << "ms" << "     " << "reducer_id" << taskIdStr << endl;
+    cerr << "Reducer For loop execution time: " << forLoopDuration / 1000.0 << " ms" << "     " << "reducer_id" << taskIdStr << endl; 
+    cerr << "Reduce push_back Time: " << totalPushBackTime.count() / 1000.0 << "ms" << "     " << "reducer_id" << taskIdStr << endl;
 
     return 0;
 }
