@@ -40,8 +40,8 @@ int main() {
     microseconds totalRTreeSearchTime(0);
     microseconds totalContainsTime(0);
     microseconds totalIOTime(0);//标准输入行
-    microseconds totalPushBackTime(0); //用于累计push_back操作的总时间
-    microseconds forLoopDuration(0);
+    //microseconds totalPushBackTime(0); //用于累计push_back操作的总时间
+    //microseconds forLoopDuration(0);
 
     string currentKey;
     while (true) {
@@ -98,15 +98,15 @@ int main() {
             }
             points.clear(); 
 
-            auto forLoopStart = high_resolution_clock::now();
+            //auto forLoopStart = high_resolution_clock::now();
 
             //输出结果
             for (const auto& entry : pointCountMap) {
                 cout << "Polygon ID: " << entry.first << ", Points count: " << entry.second << endl;
             }
 
-            auto forLoopEnd = high_resolution_clock::now(); 
-            forLoopDuration += duration_cast<microseconds>(forLoopEnd - forLoopStart); 
+            //auto forLoopEnd = high_resolution_clock::now(); 
+            //forLoopDuration += duration_cast<microseconds>(forLoopEnd - forLoopStart); 
 
             //清空rtree
             rtree.RemoveAll();
@@ -151,10 +151,10 @@ int main() {
 
         } else if (wkt.substr(0, 3) == "POI") {
 
-            auto pushBackStart = high_resolution_clock::now(); 
+            //auto pushBackStart = high_resolution_clock::now(); 
             points.push_back(wkt);
-            auto pushBackEnd = high_resolution_clock::now();
-            totalPushBackTime += duration_cast<microseconds>(pushBackEnd - pushBackStart); 
+            //auto pushBackEnd = high_resolution_clock::now();
+            //totalPushBackTime += duration_cast<microseconds>(pushBackEnd - pushBackStart); 
 
         }
     }
@@ -193,14 +193,14 @@ int main() {
             }
             points.clear(); 
 
-            auto forLoopStart = high_resolution_clock::now(); // 记录for循环开始时间
+            //auto forLoopStart = high_resolution_clock::now(); // 记录for循环开始时间
 
             for (const auto& entry : pointCountMap) {
                 cout << "Polygon ID: " << entry.first << ", Points count: " << entry.second << endl;
             }
 
-            auto forLoopEnd = high_resolution_clock::now(); // 记录for循环结束时间
-            forLoopDuration += duration_cast<microseconds>(forLoopEnd - forLoopStart); 
+            //auto forLoopEnd = high_resolution_clock::now(); // 记录for循环结束时间
+            //forLoopDuration += duration_cast<microseconds>(forLoopEnd - forLoopStart); 
 
     }
 
@@ -212,8 +212,8 @@ int main() {
     cerr << "Reducer R-Tree Search Time: " << (totalRTreeSearchTime.count() - totalContainsTime.count()) / 1000000.0 << "s" << endl;
     cerr << "Reducer Contains Check Time: " << totalContainsTime.count() / 1000000.0 << "s" << endl;
     cerr << "Reducer IO Read Time: " << totalIOTime.count() / 1000000.0 << "s" << endl;
-    cerr << "Reducer Forloop Cout time:" << forLoopDuration.count() / 1000000.0 << " s" << endl; 
-    cerr << "Reducer push_back points Time: " << totalPushBackTime.count() / 1000000.0 << "s" << endl;
+    //cerr << "Reducer Forloop Cout time:" << forLoopDuration.count() / 1000000.0 << " s" << endl; 
+    //cerr << "Reducer push_back points Time: " << totalPushBackTime.count() / 1000000.0 << "s" << endl;
     cerr << "Reducer Total Reducer Time: " << duration_cast<microseconds>(endTime - startTime).count() / 1000000.0 << "s" << endl;
 
     return 0;
