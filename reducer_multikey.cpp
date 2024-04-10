@@ -51,6 +51,7 @@ int main() {
         break;
     }
 
+        //分离key与value
         stringstream ss(line);
         string key, value;
         getline(ss, key, '\t');
@@ -66,6 +67,7 @@ int main() {
 
                 auto wktReadStart = high_resolution_clock::now();
 
+                //wktreader转化成geos可以处理的格式
                 auto geom = shared_ptr<Geometry>(wktReader.read(wkt));
 
                 auto wktReadEnd = high_resolution_clock::now();
@@ -77,9 +79,12 @@ int main() {
 
                 auto rTreeSearchStart = high_resolution_clock::now();
 
+                //rtree过滤
                 rtree.Search(min, max, [&pointCountMap, &point, &totalContainsTime](PolygonData* const& pd) -> bool {
                 
-                auto containsStart = high_resolution_clock::now();    
+                auto containsStart = high_resolution_clock::now(); 
+
+                    //geos判断
                     if (pd->polygon->contains(point.get())) {
                         pointCountMap[pd->id]++;
                     }
@@ -93,8 +98,9 @@ int main() {
             }
             points.clear(); 
 
-            auto forLoopStart = high_resolution_clock::now(); 
+            auto forLoopStart = high_resolution_clock::now();
 
+            //输出结果
             for (const auto& entry : pointCountMap) {
                 cout << "Polygon ID: " << entry.first << ", Points count: " << entry.second << endl;
             }
@@ -110,7 +116,7 @@ int main() {
 
         //key值没有变化时正常建立rtree
         currentKey = key;
-
+        //分离value中的不同部分
         auto ioStart2 = high_resolution_clock::now(); 
         stringstream valueStream(value);
         string idStr, wkt;
